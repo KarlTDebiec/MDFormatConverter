@@ -1,0 +1,11 @@
+xtc_converter README
+
+    Karl Debiec
+    karl.t.debiec@gmail.com
+
+
+The purpose of this script is to loop over segments of an AMBER, ANTON,
+DESMOND, or GROMACS trajectory, select a subset of atoms, and save their
+coordinates to GROMACS' .xtc format. Additionally, the first frame of each
+segment is saved to a .pdb file. The program depends on vmd and GROMACS'
+trjconv tool. The intended use is to remove waters to speed up later analysis.
