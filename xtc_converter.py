@@ -160,6 +160,3 @@ if __name__ == '__main__':
     while len(raw_output) >= 2:
         kwargs["output"] += [(raw_output.pop(0).replace(" ", "_"), raw_output.pop(0))]
     locals()["convert_" + kwargs.pop("package")](**kwargs)
-
-
-

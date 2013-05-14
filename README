@@ -4,8 +4,10 @@ xtc_converter README
     karl.t.debiec@gmail.com
 
 
-The purpose of this script is to loop over segments of an AMBER, ANTON,
-DESMOND, or GROMACS trajectory, select a subset of atoms, and save their
-coordinates to GROMACS' .xtc format. Additionally, the first frame of each
-segment is saved to a .pdb file. The program depends on vmd and GROMACS'
-trjconv tool. The intended use is to remove waters to speed up later analysis.
+The purpose of this script is to automate conversion of AMBER, ANTON, DESMOND,
+and GROMACS trajectories into an efficient and consistent format. It loads
+each segment of a trajectory using VMD, selects a subset of atoms, saves their
+topology to .pdb format, and saves their coordinates to GROMACS' .xtc format.
+The intended usage is to remove waters from trajectories to speed up analysis,
+and to use one set of analysis tools for multiple packages. VMD and GROMACS'
+trjconv are required.
