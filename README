@@ -9,5 +9,5 @@ and GROMACS trajectories into an efficient and consistent format. It loads
 each segment of a trajectory using VMD, selects a subset of atoms, saves their
 topology to .pdb format, and saves their coordinates to GROMACS' .xtc format.
 The intended usage is to remove waters from trajectories to speed up analysis,
-and to use one set of analysis tools for multiple packages. VMD and GROMACS'
-trjconv are required.
+and prepare data from multiple packages to be analyzed with a single set of
+tools. VMD and GROMACS' trjconv are required.
