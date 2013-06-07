@@ -146,12 +146,14 @@ if __name__ == '__main__':
       action    = "store_true",
       help      = "Omit last segment of trajectory")
 
-    kwargs      = dict(((k,v) for k,v in dict(parser.parse_args()._get_kwargs()).iteritems() if v is not None))
-    raw_output  = kwargs.pop("output")[0]
+    kwargs                  = dict(((k,v) for k,v in dict(parser.parse_args()._get_kwargs()).iteritems() if v is not None))
+    if not kwargs["path"].endswith("/"):
+        kwargs["path"]      = kwargs["path"] + "/"
+    raw_output              = kwargs.pop("output")[0]
     if len(raw_output) % 2 != 0:
         raise Exception("Output arguments must be in pairs of atom selection and suffix")
-    kwargs["output"]    = []
-    while len(raw_output) >= 2:
-        kwargs["output"] += [(raw_output.pop(0).replace(" ", "_"), raw_output.pop(0))]
+    kwargs["output"]        = []
+    while len(raw_output)  >= 2:
+        kwargs["output"]   += [(raw_output.pop(0).replace(" ", "_"), raw_output.pop(0))]
 
     locals()["convert_" + kwargs.pop("package")](**kwargs)
