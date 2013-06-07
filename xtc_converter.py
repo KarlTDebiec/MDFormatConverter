@@ -64,7 +64,7 @@ def convert_anton(path, output, infile = None, force = False, in_progress = Fals
     segments        = segments_stk(path, stk)
     if in_progress:   segments = segments[:-1]
     vmd_eval        = "\"vmd -dispdev text -e " + vmd_script + " -args anton " + cms + " {0}\"" + \
-                      ".format(segment.file_of_type('atr'))"
+                      ".format(segment.file_of_type('dtr'))"
     for segment in segments:
         print segment, segment.path
         execute_shell_command("mkdir -pv {0}".format(segment.path))
