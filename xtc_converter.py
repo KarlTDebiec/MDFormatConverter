@@ -2,7 +2,7 @@
 desc = """xtc_converter.py
     Converts trajectories to pdb and xtc format
     Written by Karl Debiec on 13-04-12
-    Last updated 13-05-15"""
+    Last updated 13-07-09"""
 ########################################### MODULES, SETTINGS, AND DEFAULTS ############################################
 import argparse, os, subprocess, sys
 from   standard_functions import Segment, execute_shell_command, segments_standard
@@ -39,22 +39,41 @@ def convert(vmd_eval, path, output, force = False, in_progress = False, **kwargs
                 rm_command         += " rm -v {0}.trr; ".format(prefix)
         if new_output:
             execute_shell_command(vmd_command)
-            execute_shell_command(trjconv_command, output = "stderr")
+            execute_shell_command(trjconv_command)
             execute_shell_command(rm_command)
 
-def convert_desmond(infile = None, **kwargs):
+def convert_desmond(path, output, infile = None, force = False, in_progress = False, **kwargs):
     if not (infile == None):
         raise Exception("Desmond converter does not accept infile(s)")
     vmd_eval        = "\"vmd -dispdev text -e " + vmd_script + " -args desmond {0} {1}/clickme.dtr\"" + \
-                      ".format(segment.file_of_type('cms'), segment.file_of_type('_trj'))"
-    convert(vmd_eval, **kwargs)
+                      ".format(segment['cms'], segment['_trj'])"
+    segments        = segments_standard(path)
+    if in_progress:   segments = segments[:-1]
+    for segment in segments:
+        print segment, segment.path
+        new_output      = False
+        try:              vmd_command   = eval(vmd_eval)
+        except:           continue
+        trjconv_command = ""
+        rm_command      = ""
+        for sel, suffix in output:
+            prefix  = segment.path + segment + suffix
+            if force or not os.path.isfile(prefix  + ".pdb") or not os.path.isfile(prefix  + ".xtc"):
+                new_output          = True
+                vmd_command        += " \"{0}\" {1}.pdb {1}.trr ".format(sel, prefix)
+                trjconv_command    += " trjconv -f {0}.trr -o {0}.xtc -ndec 5; ".format(prefix)
+                rm_command         += " rm -v {0}.trr; ".format(prefix)
+        if new_output:
+            execute_shell_command(vmd_command)
+            execute_shell_command(trjconv_command)
+            execute_shell_command(rm_command)
 
 def convert_amber(infile = None,**kwargs):
     if not (isinstance(infile, list) and len(infile) == 1):
         raise Exception("Amber converter requires prmtop infile")
     top             = infile[0]
     vmd_eval        = "\"vmd -dispdev text -e " + vmd_script + " -args amber " + top + " {0}\"" + \
-                      ".format(segment.file_of_type('crd'))"
+                      ".format(segment['crd'])"
     convert(vmd_eval, **kwargs)
 
 def convert_anton(path, output, infile = None, force = False, in_progress = False, **kwargs):
@@ -63,8 +82,13 @@ def convert_anton(path, output, infile = None, force = False, in_progress = Fals
     cms, stk        = infile
     segments        = segments_stk(path, stk)
     if in_progress:   segments = segments[:-1]
+    try:
+        segments[0]["atr"]
+        extension   = "atr"
+    except:
+        extension   = "dtr"
     vmd_eval        = "\"vmd -dispdev text -e " + vmd_script + " -args anton " + cms + " {0}\"" + \
-                      ".format(segment.file_of_type('dtr'))"
+                      ".format(segment['" + extension + "'])"
     for segment in segments:
         print segment, segment.path
         execute_shell_command("mkdir -pv {0}".format(segment.path))
@@ -82,9 +106,10 @@ def convert_anton(path, output, infile = None, force = False, in_progress = Fals
                 rm_command         += " rm -v {0}.trr; ".format(prefix)
         if new_output:
             execute_shell_command(vmd_command)
-            execute_shell_command(trjconv_command, output = "stderr")
+            execute_shell_command(trjconv_command)
             execute_shell_command(rm_command)
-            try:      execute_shell_command("cp -v {0} {1}".format(segment.file_of_type("eneseq.txt"), ene))
+        if force or not os.path.isfile(ene):
+            try:      execute_shell_command("cp -v {0} {1}".format(segment["eneseq.txt"], ene))
             except:   continue
 
 def convert_gromacs(path, output, infile = None, force = False, in_progress = False, **kwargs):
@@ -96,7 +121,7 @@ def convert_gromacs(path, output, infile = None, force = False, in_progress = Fa
         if suffix  == "":
             raise Exception("Gromacs conversion without suffix may overwrite original xtc file")
     vmd_eval        = "\"vmd -dispdev text -e " + vmd_script + " -args gromacs {0} {1}\"" + \
-                      ".format(segment.file_of_type('gro'), segment.file_of_type(segment + '.xtc'))"
+                      ".format(segment['gro'], segment[segment + '.xtc'])"
     for segment in segments:
         print segment, segment.path
         new_output      = False
@@ -113,11 +138,11 @@ def convert_gromacs(path, output, infile = None, force = False, in_progress = Fa
                 rm_command         += " rm -v {0}.trr; ".format(prefix)
         if new_output:
             execute_shell_command(vmd_command)
-            execute_shell_command(trjconv_command, output = "stderr")
+            execute_shell_command(trjconv_command)
             execute_shell_command(rm_command)
 
 ######################################################### MAIN #########################################################
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = desc, formatter_class = argparse.RawTextHelpFormatter)
     parser.add_argument("-package",
       required  = True,

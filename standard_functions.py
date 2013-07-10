@@ -1,9 +1,8 @@
 #!/usr/bin/python
-
 desc = """standard_functions.py
     Standard functions
     Written by Karl Debiec on 13-02-03
-    Last updated 13-04-14"""
+    Last updated 13-07-09"""
 ########################################### MODULES, SETTINGS, AND DEFAULTS ############################################
 import os, subprocess, sys
 import numpy as np
@@ -20,10 +19,16 @@ class Segment:
     def __repr__(self):         return self.number
     def __add__(self, other):   return str(self.number) + other
     def __radd__(self, other):  return other + str(self.number)
-    def file_of_type(self, end):
-        temp    = [f for f in self.files if f.endswith(end)]
-        if len(temp) == 1:  return temp[0]
-        else:               raise  Exception("Multiple files with extension {0} present".format(end))
+    def __getitem__(self, extension):
+        matches = [f for f in self.files if f.endswith(extension)]
+        if   len(matches) == 1:
+            return matches[0]
+        elif len(matches) == 0:
+            raise Exception("No files with extension {0} present\n".format(extension) + 
+                            "Files present: {1}".format(self.files))
+        else:
+            raise Exception("Multiple files with extension {0} present\n".format(extension) +
+                            "Files present: {1}".format(self.files))
 def segments_standard(path):
     """ Lists segment folders, topologies, and trajectories  at <path>, assuming the format ####/####.* """
     segments = []
@@ -38,10 +43,8 @@ def is_num(test):
     try:    float(test)
     except: return False
     return  True
-def execute_shell_command(command, leader = "", output = "stdout"):
-    pipe    = subprocess.Popen(command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    if   output == "stdout":
-        for line in iter(pipe.stdout.readline, ""):     print "{0}{1}".format(leader, line.rstrip().replace("\n", " "))
-    elif output == "stderr":
-        for line in iter(pipe.stderr.readline, ""):     print "{0}{1}".format(leader, line.rstrip().replace("\n", " "))
+def execute_shell_command(command, leader = ""):
+    pipe    = subprocess.Popen(command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+    for line in iter(pipe.stdout.readline, ""):
+        print leader + line.rstrip().replace("\n", " ")
     pipe.wait()
