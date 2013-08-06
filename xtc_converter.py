@@ -21,27 +21,6 @@ def segments_stk(path, stk):
                                    files    = files)]
     return segments
 
-def convert(vmd_eval, path, output, force = False, in_progress = False, **kwargs):
-    segments        = segments_standard(path)
-    if in_progress:   segments = segments[:-1]
-    for segment in segments:
-        print segment, segment.path
-        new_output      = False
-        vmd_command     = eval(vmd_eval)
-        trjconv_command = ""
-        rm_command      = ""
-        for sel, suffix in output:
-            prefix  = segment.path + segment + suffix
-            if force or not os.path.isfile(prefix  + ".pdb") or not os.path.isfile(prefix  + ".xtc"):
-                new_output          = True
-                vmd_command        += " \"{0}\" {1}.pdb {1}.trr ".format(sel, prefix)
-                trjconv_command    += " trjconv -f {0}.trr -o {0}.xtc -ndec 5; ".format(prefix)
-                rm_command         += " rm -v {0}.trr; ".format(prefix)
-        if new_output:
-            execute_shell_command(vmd_command)
-            execute_shell_command(trjconv_command)
-            execute_shell_command(rm_command)
-
 def convert_desmond(path, output, infile = None, force = False, in_progress = False, **kwargs):
     if not (infile == None):
         raise Exception("Desmond converter does not accept infile(s)")
@@ -74,7 +53,26 @@ def convert_amber(infile = None,**kwargs):
     top             = infile[0]
     vmd_eval        = "\"vmd -dispdev text -e " + vmd_script + " -args amber " + top + " {0}\"" + \
                       ".format(segment['crd'])"
-    convert(vmd_eval, **kwargs)
+    segments        = segments_standard(path)
+    if in_progress:   segments = segments[:-1]
+    for segment in segments:
+        print segment, segment.path
+        new_output      = False
+        vmd_command     = eval(vmd_eval)
+        trjconv_command = ""
+        rm_command      = ""
+        for sel, suffix in output:
+            prefix  = segment.path + segment + suffix
+            if force or not os.path.isfile(prefix  + ".pdb") or not os.path.isfile(prefix  + ".xtc"):
+                new_output          = True
+                vmd_command        += " \"{0}\" {1}.pdb {1}.trr ".format(sel, prefix)
+                trjconv_command    += " trjconv -f {0}.trr -o {0}.xtc -ndec 5; ".format(prefix)
+                rm_command         += " rm -v {0}.trr; ".format(prefix)
+        if new_output:
+            execute_shell_command(vmd_command)
+            execute_shell_command(trjconv_command)
+            execute_shell_command(rm_command)
+
 
 def convert_anton(path, output, infile = None, force = False, in_progress = False, **kwargs):
     if not (isinstance(infile, list) and len(infile) == 2):
@@ -82,7 +80,7 @@ def convert_anton(path, output, infile = None, force = False, in_progress = Fals
     cms, stk        = infile
     segments        = segments_stk(path, stk)
     if in_progress:   segments = segments[:-1]
-    try:
+    try:                                                    # Compatibility with older and current anton_software
         segments[0]["atr"]
         extension   = "atr"
     except:
@@ -99,7 +97,7 @@ def convert_anton(path, output, infile = None, force = False, in_progress = Fals
         for sel, suffix in output:
             prefix      = segment.path + segment + suffix
             ene         = segment.path + segment + ".ene"
-            if force or not os.path.isfile(prefix  + ".pdb") or not os.path.isfile(prefix  + ".xtc"):
+            if force or not os.path.isfile(prefix + ".pdb") or not os.path.isfile(prefix + ".xtc"):
                 new_output          = True
                 vmd_command        += " \"{0}\" {1}.pdb {1}.trr ".format(sel, prefix)
                 trjconv_command    += " trjconv -f {0}.trr -o {0}.xtc -ndec 5; ".format(prefix)
@@ -112,7 +110,7 @@ def convert_anton(path, output, infile = None, force = False, in_progress = Fals
             try:      execute_shell_command("cp -v {0} {1}".format(segment["eneseq.txt"], ene))
             except:   continue
 
-def convert_gromacs(path, output, infile = None, force = False, in_progress = False, **kwargs):
+def convert_gromacs(path, output, group = 16, infile = None, force = False, in_progress = False, **kwargs):
     if infile != None:
         raise Exception("Gromacs converter does not accept infile(s)")
     segments        = segments_standard(path) 
@@ -130,10 +128,10 @@ def convert_gromacs(path, output, infile = None, force = False, in_progress = Fa
         rm_command      = ""
         for sel, suffix in output:
             prefix      = segment.path + segment + suffix
-            if force or not os.path.isfile(prefix  + ".pdb") or not os.path.isfile(prefix  + ".xtc"):
+            if force or not os.path.isfile(prefix + ".pdb") or not os.path.isfile(prefix + ".xtc"):
                 new_output          = True
                 vmd_command        += " \"{0}\" {1}.pdb {1}.trr ".format(sel, prefix)
-                trjconv_command    += " echo -e \"1 \n\" | trjconv -f {0}.trr -o {0}.xtc".format(prefix) + \
+                trjconv_command    += " echo -e \"{0} \n\" | trjconv -f {1}.trr -o {1}.xtc".format(group, prefix) + \
                                       " -s {0}/{1}.tpr -ndec 5 -pbc whole; ".format(segment.path, segment)
                 rm_command         += " rm -v {0}.trr; ".format(prefix)
         if new_output:
@@ -164,6 +162,10 @@ if __name__ == "__main__":
       nargs     = "*",
       help      = "Output atom selections and suffixes for outfiles. Must be multiple of two. " +
                   "E.g. \"-output 'not water' '_solute'\"")
+    parser.add_argument("-group",
+      required  = False,
+      type      = int,
+      help      = "Atom group number to pass to trjconv. Only used for Gromacs")
     parser.add_argument("--force",
       action    = "store_true",
       help      = "Force output; do not skip segments for which expected output is already present")
@@ -182,3 +184,5 @@ if __name__ == "__main__":
         kwargs["output"]   += [(raw_output.pop(0).replace(" ", "_"), raw_output.pop(0))]
 
     locals()["convert_" + kwargs.pop("package")](**kwargs)
+
+
