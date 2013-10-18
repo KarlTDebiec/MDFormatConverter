@@ -2,7 +2,7 @@
 desc = """xtc_converter.py
     Converts trajectories to pdb and xtc format
     Written by Karl Debiec on 13-04-12
-    Last updated 13-07-09"""
+    Last updated 13-10-18"""
 ########################################### MODULES, SETTINGS, AND DEFAULTS ############################################
 import argparse, os, subprocess, sys
 from   standard_functions import Segment, execute_shell_command, segments_standard
@@ -47,11 +47,13 @@ def convert_desmond(path, output, infile = None, force = False, in_progress = Fa
             execute_shell_command(trjconv_command)
             execute_shell_command(rm_command)
 
-def convert_amber(infile = None,**kwargs):
+def convert_amber(path, output, infile = None, netcdf = False, force = False, in_progress = False, **kwargs):
     if not (isinstance(infile, list) and len(infile) == 1):
         raise Exception("Amber converter requires prmtop infile")
     top             = infile[0]
-    vmd_eval        = "\"vmd -dispdev text -e " + vmd_script + " -args amber " + top + " {0}\"" + \
+    if    netcdf:     crdtype   = "netcdf"
+    else:             crdtype   = "crdbox"
+    vmd_eval        = "\"vmd -dispdev text -e " + vmd_script + " -args amber " + top + " {0} " + crdtype + "\"" + \
                       ".format(segment['crd'])"
     segments        = segments_standard(path)
     if in_progress:   segments = segments[:-1]
@@ -165,13 +167,16 @@ if __name__ == "__main__":
     parser.add_argument("-group",
       required  = False,
       type      = int,
-      help      = "Atom group number to pass to trjconv. Only used for Gromacs")
+      help      = "Atom group number to pass to trjconv; Only used for Gromacs")
     parser.add_argument("--force",
       action    = "store_true",
       help      = "Force output; do not skip segments for which expected output is already present")
     parser.add_argument("--in_progress",
       action    = "store_true",
       help      = "Omit last segment of trajectory")
+    parser.add_argument("--netcdf",
+      action    = "store_true",
+      help      = "Read input in Amber's NetCDF format; Only used for Amber")
 
     kwargs                  = dict(((k,v) for k,v in dict(parser.parse_args()._get_kwargs()).iteritems() if v is not None))
     if not kwargs["path"].endswith("/"):

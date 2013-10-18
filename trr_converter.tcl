@@ -1,7 +1,7 @@
-#trr_converter.tcl
+# trr_converter.tcl
 #   Converts trajectories to pdb and trr format
 #   Written by Karl Debiec on 12-12-01
-#   Last updated 13-04-26
+#   Last updated 13-10-18
 ########################################### MODULES, SETTINGS, AND DEFAULTS ############################################
 package require pbctools
 ###################################################### FUNCTIONS #######################################################
@@ -29,9 +29,10 @@ proc convert { argv } {
 proc convert_amber { argv } {
     set     top     [lindex $argv 0]
     set     crd     [lindex $argv 1]
-    set     argv    [lrange $argv 2 end]
+    set     type    [lindex $argv 2]
+    set     argv    [lrange $argv 3 end]
     mol     new     $top type parm7     waitfor all
-    mol     addfile $crd type crdbox    waitfor all 0
+    mol     addfile $crd type $type     waitfor all 0
     convert $argv
 }
 proc convert_anton { argv } {
