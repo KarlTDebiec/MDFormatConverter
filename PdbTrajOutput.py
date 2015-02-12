@@ -89,7 +89,7 @@ class PdbTrajOutput(TrajOutput):
         """
         level2_subparser = level2_subparsers.add_parser(
           name  = "pdb",
-          usage = "Converter.py {0} pdb".format(level1_subparser.name),
+          usage = "convert.py {0} pdb".format(level1_subparser.name),
           help  = "PDB output")
         setattr(level2_subparser, "name", "pdb")
 

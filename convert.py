@@ -8,9 +8,8 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-.. todo:
-    - TrajOutput should take first last and step settings
-    - Pass debug and verbose to VMD
+Converts Molecular Dynamics (MD) simulation trajectories that are split
+into multiple segments between different formats.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
@@ -22,7 +21,7 @@ if __name__ == "__main__":
     import argparse
 
     parser             = argparse.ArgumentParser(
-      usage            = "Converter.py {input format} {output format} "
+      usage            = "convert.py {input format} {output format} "
                          "{converter}",
       description      = __doc__,
       formatter_class  = argparse.RawTextHelpFormatter)

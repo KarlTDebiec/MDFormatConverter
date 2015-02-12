@@ -2,11 +2,11 @@ Introduction
 ============
 
 md_format_converter is a python package used to convert Molecular Dynamics (MD)
-simulation trajectories that are split into multiple files (segments) between
-different formats. Currently, the package exclusively supports converstion from
-Anton format trajectories to PDB and Amber NetCDF formats, using the program
-Visual Molecular Dynamics (VMD). The package is currently much more complex
-than necessary for this purpose, in order to facilitate future integration in
+simulation trajectories that are split into multiple segments between different
+formats. Currently, the package exclusively supports converstion from Anton
+format trajectories to PDB and Amber NetCDF formats, using the program Visual
+Molecular Dynamics (VMD). The package is currently much more complex than
+necessary for this purpose, in order to facilitate future integration in
 complex conversion and analysis pipelines.
 
 Dependencies

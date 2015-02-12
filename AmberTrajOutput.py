@@ -86,7 +86,7 @@ class AmberTrajOutput(TrajOutput):
         """
         level2_subparser = level2_subparsers.add_parser(
           name  = "amber",
-          usage = "Converter.py {0} amber".format(level1_subparser.name),
+          usage = "convert.py {0} amber".format(level1_subparser.name),
           help  = "Amber NetCDF output")
         setattr(level2_subparser, "name", "amber")
 

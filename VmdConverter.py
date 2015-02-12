@@ -52,6 +52,8 @@ class VmdConverter(Converter):
             if len(segment.outputs) == 0:
                 continue
             run_command(command, verbose=True)
+            from sys import exit
+            exit()
 
     @staticmethod
     def add_subparser(level1_subparser, level2_subparser, level3_subparsers):
@@ -71,7 +73,7 @@ class VmdConverter(Converter):
         """
         level3_subparser = level3_subparsers.add_parser(
           name  = "vmd",
-          usage = "Converter.py {0} {1} vmd".format(level1_subparser.name,
+          usage = "convert.py {0} {1} vmd".format(level1_subparser.name,
             level2_subparser.name),
           help  = "Conversion using Visual Molecular Dynamics")
         setattr(level1_subparser, "name", "vmd")

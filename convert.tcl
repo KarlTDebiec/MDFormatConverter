@@ -12,9 +12,39 @@ proc usage {} {
 
 proc help {} {
     usage
+    puts ""
+    puts "optional arguments:"
+    puts "  -h, --help            show this help message and exit"
+    puts "  -d, --debug           Enable debug output"
+    puts ""
+    puts "input:"
+    puts "  -input INPUTSPEC      Input file and settings, may be specified multiple"
+    puts "                        times. Settings are provided in the format"
+    puts "                        setting_1=value_1:setting_2=value_2:setting_3=value_3."
+    puts "                        Supported settings are:"
+    puts "                          filename: path to input file"
+    puts "                          format: format of input file"
+    puts "                          first: first frame to read"
+    puts "                          last: last frame to read"
+    puts "                          step: interval between frames"
+    puts ""
+    puts "output:"
+    puts "  -output OUTPUTSPEC    Output file and settings, may be specified multiple"
+    puts "                        times. Settings are provided in the format"
+    puts "                        setting_1=value_1:setting_2=value_2:setting_3=value_3."
+    puts "                        Supported settings are:"
+    puts "                          filename: path to input file"
+    puts "                          format: format of input file"
+    puts "                          selection: atom selection to output; '_' are"
+    puts "                            replaced with ' '"
+    puts "                          first: first frame to read"
+    puts "                          last: last frame to read"
+    puts "                          step: interval between frames"
+    puts "                        If first and last are both -1, only the topology will"
+    puts "                        be read and all coordinates will be discarded."
 }
 
-proc convert { inputs outputs } {
+proc convert { inputs outputs debug } {
 
     foreach input $inputs {
 
@@ -35,12 +65,15 @@ proc convert { inputs outputs } {
         }
         if [expr ! [info exists filename]] {
             puts "ERROR: '-input' argument must include filename"
+            exit
         }
-        puts "FILENAME  = $filename"
-        puts "FORMAT    = $format"
-        puts "FIRST     = $first"
-        puts "LAST      = $last"
-        puts "STEP      = $step"
+        if $debug {
+            puts "DEBUG: filename  = $filename"
+            puts "DEBUG: format    = $format"
+            puts "DEBUG: first     = $first"
+            puts "DEBUG: last      = $last"
+            puts "DEBUG: step      = $step"
+        }
         
         # Load infile
         if [expr ! [info exists topology_read]] {
@@ -55,8 +88,10 @@ proc convert { inputs outputs } {
             animate delete all 0
         }
 
-        set nframes [molinfo 0 get numframes]
-        puts "N_FRAMES  = $nframes"
+        if $debug {
+            set nframes [molinfo 0 get numframes]
+            puts "DEBUG: n_frames  = $nframes"
+        }
     }
 
     foreach output $outputs {
@@ -79,40 +114,42 @@ proc convert { inputs outputs } {
         }
         if [expr ! [info exists filename]] {
             puts "ERROR: '-output' argument must include filename"
+            exit
         }
         set selection [regsub -all {_} $selection " "]
 
-        set nframes [molinfo 0 get numframes]
-        puts "FILENAME  = $filename"
-        puts "FORMAT    = $format"
-        puts "SELECTION = $selection"
-        puts "FIRST     = $first"
-        puts "LAST      = $last"
-        puts "STEP      = $step"
-        puts "N_FRAMES  = $nframes"
+        if $debug {
+            set nframes [molinfo 0 get numframes]
+            puts "FILENAME  = $filename"
+            puts "FORMAT    = $format"
+            puts "SELECTION = $selection"
+            puts "FIRST     = $first"
+            puts "LAST      = $last"
+            puts "STEP      = $step"
+            puts "N_FRAMES  = $nframes"
+        }
         set selection [atomselect 0 $selection]
         puts "animate write $format $filename sel $selection beg $first end $last step $step 0 waitfor all 0"
         animate write $format $filename sel $selection beg $first end $last skip $step waitfor all 0
     }
 }
-proc convert_anton { argv } {
-    set     cms     [lindex $argv 0]
-    set     atr     [lindex $argv 1]
-    set     argv    [lrange $argv 2 end]
-    mol     new     $cms type mae   waitfor all
-    mol     addfile $atr type dtr   waitfor all 0
-    animate delete  beg 0 end 0 0
-    convert $argv
-}
+
 #################################### MAIN #####################################
+
+# Set defaults
 set inputs [list]
 set outputs [list]
+set debug 0
+
+# Parse arguments
 while {[llength $argv] > 0} {
     set arg [lindex $argv 0]
     set argv [lrange $argv 1 end]
     if {($arg == "-h") || ($arg == "--help")} {
         help
         exit
+    } elseif {($arg == "-d") || ($arg == "--debug")} {
+        set debug 1
     } elseif {$arg == "-input"} {
         set mode "input"
     } elseif {$arg == "-output"} {
@@ -125,5 +162,6 @@ while {[llength $argv] > 0} {
         usage
     }
 }
-convert $inputs $outputs
+
+convert $inputs $outputs $debug
 exit

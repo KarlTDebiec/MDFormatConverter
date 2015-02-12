@@ -97,7 +97,7 @@ class AntonTrajInput(TrajInput):
         """
         level1_subparser = level1_subparsers.add_parser(
           name  = "anton",
-          usage = "Converter.py anton {output format} {converter}",
+          usage = "convert.py anton {output format} {converter}",
           help  = "Anton atr input")
         setattr(level1_subparser, "name", "anton")
 
