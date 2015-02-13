@@ -33,7 +33,9 @@ class AmberTrajOutput(TrajOutput):
             segments after processing
           kwargs (dict): Additional keyword arguments
         """
-        self.outpath = outpath
+        import os
+
+        self.outpath = os.path.expandvars(outpath)
         if suffix is None:
             self.suffix = suffix
         elif suffix.startswith("_"):

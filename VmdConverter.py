@@ -52,8 +52,6 @@ class VmdConverter(Converter):
             if len(segment.outputs) == 0:
                 continue
             run_command(command, verbose=True)
-            from sys import exit
-            exit()
 
     @staticmethod
     def add_subparser(level1_subparser, level2_subparser, level3_subparsers):

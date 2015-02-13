@@ -36,16 +36,49 @@ if __name__ == "__main__":
     from .VmdConverter import VmdConverter
     level3_classes = [VmdConverter]
 
+    level1_subparser = level1_subparsers.add_parser(
+      name  = "yaml",
+      usage = "convert.py yaml YAML_FILE",
+      help  = "Read input, output, and converter configuration from YAML file")
+    level1_subparser.add_argument("yaml_filename")
+    level1_subparser.set_defaults(input_source="yaml")
+
     for level1_class in level1_classes:
         level1_class.add_subparser(level1_subparsers, level2_classes,
           level3_classes)
 
     kwargs = vars(parser.parse_args())
 
-    input_source = kwargs.pop("input_source")(**kwargs)
-    output_coroutine = kwargs.pop("output_coroutine")(**kwargs)
-    converter_sink = kwargs.pop("converter_sink")(**kwargs)
-    output_coroutine.add_target(converter_sink)
+    input_source = kwargs.pop("input_source")
+    if input_source == "yaml":
+        from . import get_yaml
 
-    for segment in input_source:
-        output_coroutine.send(segment)
+        yaml_dict = get_yaml(kwargs.pop("yaml_filename"))
+
+        input_source_kwargs = yaml_dict.pop("input")
+        input_source = {"anton": AntonTrajInput}.get(
+          input_source_kwargs.pop("format"))(**input_source_kwargs)
+        
+        converter_sink_kwargs = yaml_dict.pop("converter")
+        converter_sink = {"vmd": VmdConverter}.get(
+          converter_sink_kwargs.pop("format"))(**converter_sink_kwargs)
+        next_target = converter_sink
+
+        output_coroutine_list = yaml_dict.pop("output")
+        for output_coroutine_kwargs in output_coroutine_list:
+            output_coroutine = {"amber": AmberTrajOutput,
+              "pdb": PdbTrajOutput}.get(
+              output_coroutine_kwargs.pop("format"))(**output_coroutine_kwargs)
+            output_coroutine.add_target(next_target)
+            next_target = output_coroutine
+        for segment in input_source:
+            next_target.send(segment)
+
+    else:
+        input_source = input_source(**kwargs)
+        output_coroutine = kwargs.pop("output_coroutine")(**kwargs)
+        converter_sink = kwargs.pop("converter_sink")(**kwargs)
+        output_coroutine.add_target(converter_sink)
+
+        for segment in input_source:
+            output_coroutine.send(segment)

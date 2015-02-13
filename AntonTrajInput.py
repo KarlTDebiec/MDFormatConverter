@@ -30,9 +30,15 @@ class AntonTrajInput(TrajInput):
               trajectory file (Anton path, local path)
             kwargs (dict): additional keyword arguments
         """
-        self.topology = topology
-        self.trajectory = trajectory
-        self.sub_path = sub_path
+        import os
+
+        self.topology = os.path.expandvars(topology)
+        self.trajectory = os.path.expandvars(trajectory)
+        if sub_path is not None:
+            self.sub_path = (os.path.expandvars(sub_path[0]),
+                             os.path.expandvars(sub_path[1]))
+        else:
+            self.sub_path = None
         self.infile = open(self.trajectory, "r")
 
         super(self.__class__, self).__init__(**kwargs)
@@ -61,6 +67,7 @@ class AntonTrajInput(TrajInput):
         else:
             if self.sub_path is not None:
                 segment_atr = segment_atr.replace(*self.sub_path)
+
             number = segment_atr.split("/")[-2].split("-")[0]
             files = [segment_atr]
             ene = os.path.dirname(segment_atr) + "/energy/eneseq.txt"
