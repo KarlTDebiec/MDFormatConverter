@@ -32,6 +32,7 @@ if __name__ == "__main__":
     level1_classes  = [AntonTrajInput]
     from .AmberTrajOutput import AmberTrajOutput
     from .PdbTrajOutput import PdbTrajOutput
+    from .Mol2TrajOutput import Mol2TrajOutput
     level2_classes = [AmberTrajOutput, PdbTrajOutput]
     from .VmdConverter import VmdConverter
     level3_classes = [VmdConverter]
@@ -66,8 +67,10 @@ if __name__ == "__main__":
 
         output_coroutine_list = yaml_dict.pop("output")
         for output_coroutine_kwargs in output_coroutine_list:
-            output_coroutine = {"amber": AmberTrajOutput,
-              "pdb": PdbTrajOutput}.get(
+            output_coroutine = {
+              "amber": AmberTrajOutput,
+              "pdb":   PdbTrajOutput,
+               "mol2": Mol2TrajOutput}.get(
               output_coroutine_kwargs.pop("format"))(**output_coroutine_kwargs)
             output_coroutine.add_target(next_target)
             next_target = output_coroutine

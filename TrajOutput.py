@@ -17,18 +17,37 @@ class TrajOutput(object):
     Manages addition of output information to segments.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, outpath=None, selection=None, suffix=None, force=False,
+        **kwargs):
         """
         Initializes.
 
         Arugments:
+          outpath (str): Outfile path
+          selection (str): Atom selection string
+          suffix (str): Suffix to add to outfiles between name and
+            extension
+          force(bool): Overwrite output if already present
           targets (list): Targets to which this coroutine will send
             segments after processing
           kwargs (dict): Additional keyword arguments
         """
+        import os
+
+        self.outpath = os.path.expandvars(outpath)
+        if suffix is None:
+            self.suffix = suffix
+        elif suffix.startswith("_"):
+            self.suffix = suffix
+        else:
+            self.suffix = "_" + suffix
+        self.selection = selection
+        self.force = force
+
+        self.targets = kwargs.get("targets", [])
+
         self.func = self.receive_segment()
         self.next()
-        self.targets = kwargs.get("targets", [])
 
     def next(self, **kwargs):
         """

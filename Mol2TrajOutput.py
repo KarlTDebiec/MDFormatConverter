@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#   md_format_converter.AmberTrajOutput.py
+#   md_format_converter.Mol2TrajOutput.py
 #
 #   Copyright (C) 2012-2015 Karl T Debiec
 #   All rights reserved.
@@ -7,17 +7,45 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Manages addition of Amber output information to segments.
+Manages addition of mol2 output information to segments.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
 from .TrajOutput import TrajOutput
 ################################### CLASSES ###################################
-class AmberTrajOutput(TrajOutput):
+class Mol2TrajOutput(TrajOutput):
     """
-    Manages addition of Amber output information to segments.
+    Manages addition of mol2 output information to segments.
     """
 
+    def __init__(self, outpath=None, selection=None, suffix=None, force=False,
+        **kwargs):
+        """
+        Initializes.
+
+        Arugments:
+          outpath (str): Outfile path
+          selection (str): Atom selection string
+          suffix (str): Suffix to add to outfiles between name and
+            extension
+          force(bool): Overwrite output if already present
+          targets (list): Targets to which this coroutine will send
+            segments after processing
+          kwargs (dict): Additional keyword arguments
+        """
+        import os
+
+        self.outpath = os.path.expandvars(outpath)
+        if suffix is None:
+            self.suffix = suffix
+        elif suffix.startswith("_"):
+            self.suffix = suffix
+        else:
+            self.suffix = "_" + suffix
+        self.selection = selection
+        self.force = force
+
+        super(self.__class__, self).__init__(**kwargs)
 
     def receive_segment(self, **kwargs):
         """
@@ -30,14 +58,17 @@ class AmberTrajOutput(TrajOutput):
 
         while True:
             segment = yield
-            segment_crd = "{0}/{1:04d}/{1:04d}{2}.crd".format(self.outpath,
+            segment_mol2 = "{0}/{1:04d}/{1:04d}{2}.mol2".format(self.outpath,
               int(segment.number), self.suffix)
-            if not os.path.isfile(segment_crd) or self.force:
+            if not os.path.isfile(segment_mol2) or self.force:
                 segment.outputs.append(
                   dict(
-                    filename  = segment_crd,
-                    format    = "crd",
-                    selection = self.selection))
+                    format="mol2",
+                    filename=segment_mol2,
+                    selection=self.selection,
+                    first=0,
+                    last=0))
+
             for target in self.targets:
                 target.send(segment)
 
@@ -59,10 +90,10 @@ class AmberTrajOutput(TrajOutput):
             associated collection of level 3 subparsers
         """
         level2_subparser = level2_subparsers.add_parser(
-          name  = "amber",
-          usage = "convert.py {0} amber".format(level1_subparser.name),
-          help  = "Amber NetCDF output")
-        setattr(level2_subparser, "name", "amber")
+          name  = "mol2",
+          usage = "convert.py {0} mol2".format(level1_subparser.name),
+          help  = "mol2 output")
+        setattr(level2_subparser, "name", "mol2")
 
         level3_subparsers = level2_subparser.add_subparsers(
           title = "Converter")
@@ -72,8 +103,8 @@ class AmberTrajOutput(TrajOutput):
 
             arg_groups = {ag.title: ag 
                            for ag in level3_subparser._action_groups}
-            AmberTrajOutput.add_shared_args(level3_subparser)
+            Mol2TrajOutput.add_shared_args(level3_subparser)
 
-            level3_subparser.set_defaults(output_coroutine=AmberTrajOutput)
+            level3_subparser.set_defaults(output_coroutine=Mol2TrajOutput)
 
         return level2_subparser, level3_subparsers
