@@ -33,7 +33,6 @@ class TrajOutput(object):
           kwargs (dict): Additional keyword arguments
         """
         import os
-
         self.outpath = os.path.expandvars(outpath)
         if suffix is None:
             self.suffix = suffix

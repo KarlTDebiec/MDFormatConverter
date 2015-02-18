@@ -18,35 +18,6 @@ class PdbTrajOutput(TrajOutput):
     Manages addition of PDB output information to segments.
     """
 
-    def __init__(self, outpath=None, selection=None, suffix=None, force=False,
-        **kwargs):
-        """
-        Initializes.
-
-        Arugments:
-          outpath (str): Outfile path
-          selection (str): Atom selection string
-          suffix (str): Suffix to add to outfiles between name and
-            extension
-          force(bool): Overwrite output if already present
-          targets (list): Targets to which this coroutine will send
-            segments after processing
-          kwargs (dict): Additional keyword arguments
-        """
-        import os
-
-        self.outpath = os.path.expandvars(outpath)
-        if suffix is None:
-            self.suffix = suffix
-        elif suffix.startswith("_"):
-            self.suffix = suffix
-        else:
-            self.suffix = "_" + suffix
-        self.selection = selection
-        self.force = force
-
-        super(self.__class__, self).__init__(**kwargs)
-
     def receive_segment(self, **kwargs):
         """
         Receives a trajectory segment and sends to each target.
@@ -63,11 +34,11 @@ class PdbTrajOutput(TrajOutput):
             if not os.path.isfile(segment_pdb) or self.force:
                 segment.outputs.append(
                   dict(
-                    format="pdb",
-                    filename=segment_pdb,
-                    selection=self.selection,
-                    first=0,
-                    last=0))
+                    format    = "pdb",
+                    filename  = segment_pdb,
+                    selection = self.selection,
+                    first     = 0,
+                    last      = 0))
 
             for target in self.targets:
                 target.send(segment)
