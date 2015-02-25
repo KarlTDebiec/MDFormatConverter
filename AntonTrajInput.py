@@ -23,12 +23,12 @@ class AntonTrajInput(TrajInput):
         Initializes.
 
         Arguments:
-            topology (string): Path to input topology (cms)
-            trajectory (string): Path to text file containing paths to
-              each input segment (stk)
-            sub_path (tuple): Substitution to perform on paths in
-              trajectory file (Anton path, local path)
-            kwargs (dict): additional keyword arguments
+          topology (string): Path to input topology (cms)
+          trajectory (string): Path to text file containing paths to
+            each input segment (stk)
+          sub_path (tuple): Substitution to perform on paths in
+            trajectory file (Anton path, local path)
+          kwargs (dict): additional keyword arguments
         """
         import os
 

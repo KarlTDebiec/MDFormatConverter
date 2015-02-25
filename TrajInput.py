@@ -70,6 +70,7 @@ class TrajInput(object):
         """
         arg_groups = {ag.title: ag 
                        for ag in subparser._action_groups}
-        arg_groups["input"].add_argument("--in_progress",
-          action = "store_true",
-          help   = "Omit last segment of trajectory")
+        # Not currently implemented
+        # arg_groups["input"].add_argument("--in_progress",
+        #   action = "store_true",
+        #   help   = "Omit last segment of trajectory")

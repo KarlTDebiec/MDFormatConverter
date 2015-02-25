@@ -18,7 +18,6 @@ class AmberTrajOutput(TrajOutput):
     Manages addition of Amber output information to segments.
     """
 
-
     def receive_segment(self, **kwargs):
         """
         Receives a trajectory segment and sends to each target.

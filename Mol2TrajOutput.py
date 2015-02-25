@@ -18,6 +18,19 @@ class Mol2TrajOutput(TrajOutput):
     Manages addition of mol2 output information to segments.
     """
 
+    def __init__(self, manual_bonds=False, **kwargs):
+        """
+        Initializes.
+
+        Arguments:
+          manual_bonds (bool): Write bonds to mol2 manually
+          kwargs (dict): additional keyword arguments
+        """
+        import os
+
+        self.manual_bonds = manual_bonds
+
+        super(self.__class__, self).__init__(**kwargs)
 
     def receive_segment(self, **kwargs):
         """
@@ -40,6 +53,8 @@ class Mol2TrajOutput(TrajOutput):
                     selection = self.selection,
                     first     = 0,
                     last      = 0))
+                if self.manual_bonds:
+                    segment.outputs[-1]["format"] = "mol2_manual_bonds"
 
             for target in self.targets:
                 target.send(segment)
@@ -75,6 +90,12 @@ class Mol2TrajOutput(TrajOutput):
 
             arg_groups = {ag.title: ag 
                            for ag in level3_subparser._action_groups}
+            if level3_subparser.name == "vmd":
+                arg_groups["action"].add_argument("--manual-bonds",
+                  action   = "store_true",
+                  dest     = "manual_bonds",
+                  help     = "Write bonds to mol2 manually; useful for "
+                             "topologies in which atoms are not well-ordered")
             Mol2TrajOutput.add_shared_args(level3_subparser)
 
             level3_subparser.set_defaults(output_coroutine=Mol2TrajOutput)

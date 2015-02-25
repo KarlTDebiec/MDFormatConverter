@@ -29,11 +29,14 @@ if __name__ == "__main__":
       title            = "Input trajectory format")
 
     from .AntonTrajInput import AntonTrajInput
-    level1_classes  = [AntonTrajInput]
+    from .StandardTrajInput import StandardTrajInput
+    level1_classes  = [AntonTrajInput, StandardTrajInput]
+
     from .AmberTrajOutput import AmberTrajOutput
     from .PdbTrajOutput import PdbTrajOutput
     from .Mol2TrajOutput import Mol2TrajOutput
-    level2_classes = [AmberTrajOutput, PdbTrajOutput]
+    level2_classes = [AmberTrajOutput, PdbTrajOutput, Mol2TrajOutput]
+
     from .VmdConverter import VmdConverter
     level3_classes = [VmdConverter]
 
@@ -57,11 +60,14 @@ if __name__ == "__main__":
         yaml_dict = get_yaml(kwargs.pop("yaml_filename"))
 
         input_source_kwargs = yaml_dict.pop("input")
-        input_source = {"anton": AntonTrajInput}.get(
+        input_source = {
+          "anton":    AntonTrajInput,
+          "standard": StandardTrajInput}.get(
           input_source_kwargs.pop("format"))(**input_source_kwargs)
         
         converter_sink_kwargs = yaml_dict.pop("converter")
-        converter_sink = {"vmd": VmdConverter}.get(
+        converter_sink = {
+          "vmd": VmdConverter}.get(
           converter_sink_kwargs.pop("format"))(**converter_sink_kwargs)
         next_target = converter_sink
 
@@ -70,7 +76,7 @@ if __name__ == "__main__":
             output_coroutine = {
               "amber": AmberTrajOutput,
               "pdb":   PdbTrajOutput,
-               "mol2": Mol2TrajOutput}.get(
+              "mol2":  Mol2TrajOutput}.get(
               output_coroutine_kwargs.pop("format"))(**output_coroutine_kwargs)
             output_coroutine.add_target(next_target)
             next_target = output_coroutine

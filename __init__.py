@@ -9,6 +9,7 @@
 """
 .. todo:
     - Pass debug and verbose to VMD
+    - Figure out reasonable way to copy Anton ene log
 """
 ################################### MODULES ###################################
 from os.path import dirname

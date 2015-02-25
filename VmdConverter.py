@@ -43,8 +43,9 @@ class VmdConverter(Converter):
                 command +=  " -output "
                 for key, value in output.items():
                     if key == "selection":
-                        command += "{0}\={1}:".format(key,
-                                     value.replace(" ", "_"))
+                        if value is not None:
+                            command += "{0}\={1}:".format(key,
+                                         value.replace(" ", "_"))
                     else:
                         command += "{0}\={1}:".format(key, value)
                 command = command[:-1]
@@ -74,7 +75,7 @@ class VmdConverter(Converter):
           usage = "convert.py {0} {1} vmd".format(level1_subparser.name,
             level2_subparser.name),
           help  = "Conversion using Visual Molecular Dynamics")
-        setattr(level1_subparser, "name", "vmd")
+        setattr(level3_subparser, "name", "vmd")
 
         level3_subparser.add_argument_group("input")
         level3_subparser.add_argument_group("action")
