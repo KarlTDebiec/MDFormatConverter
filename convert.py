@@ -20,17 +20,17 @@ if __name__ == "__main__":
 if __name__ == "__main__":
     import argparse
 
-    parser             = argparse.ArgumentParser(
-      usage            = "convert.py {input format} {output format} "
-                         "{converter}",
-      description      = __doc__,
-      formatter_class  = argparse.RawTextHelpFormatter)
+    parser            = argparse.ArgumentParser(
+      usage           = "convert.py {input format} {output format} "
+                        "{converter}",
+      description     = __doc__,
+      formatter_class = argparse.RawTextHelpFormatter)
     level1_subparsers = parser.add_subparsers(
-      title            = "Input trajectory format")
+      title           = "Input trajectory format")
 
     from .AntonTrajInput import AntonTrajInput
     from .StandardTrajInput import StandardTrajInput
-    level1_classes  = [AntonTrajInput, StandardTrajInput]
+    level1_classes = [AntonTrajInput, StandardTrajInput]
 
     from .AmberTrajOutput import AmberTrajOutput
     from .PdbTrajOutput import PdbTrajOutput
@@ -64,7 +64,7 @@ if __name__ == "__main__":
           "anton":    AntonTrajInput,
           "standard": StandardTrajInput}.get(
           input_source_kwargs.pop("format"))(**input_source_kwargs)
-        
+
         converter_sink_kwargs = yaml_dict.pop("converter")
         converter_sink = {
           "vmd": VmdConverter}.get(

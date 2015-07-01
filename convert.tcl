@@ -199,6 +199,10 @@ proc convert { inputs outputs debug } {
         }
 
         # Write outfile
+        set path [file dirname $filename]
+        if [expr ! [file exists $path ]] {
+            file mkdir $path
+        }
         set selection [atomselect 0 $selection]
         if [string equal $format "mol2_manual_bonds"] {
             write_mol2_manual_bonds $filename $selection $first $last $step

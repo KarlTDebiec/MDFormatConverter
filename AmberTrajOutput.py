@@ -35,7 +35,7 @@ class AmberTrajOutput(TrajOutput):
                 segment.outputs.append(
                   dict(
                     filename  = segment_crd,
-                    format    = "crd",
+                    format    = "crdbox",
                     selection = self.selection))
             for target in self.targets:
                 target.send(segment)
@@ -60,7 +60,7 @@ class AmberTrajOutput(TrajOutput):
         level2_subparser = level2_subparsers.add_parser(
           name  = "amber",
           usage = "convert.py {0} amber".format(level1_subparser.name),
-          help  = "Amber NetCDF output")
+          help  = "Amber crd text output")
         setattr(level2_subparser, "name", "amber")
 
         level3_subparsers = level2_subparser.add_subparsers(
@@ -69,7 +69,7 @@ class AmberTrajOutput(TrajOutput):
             level3_subparser = level3_class.add_subparser(level1_subparser,
               level2_subparser, level3_subparsers)
 
-            arg_groups = {ag.title: ag 
+            arg_groups = {ag.title: ag
                            for ag in level3_subparser._action_groups}
             AmberTrajOutput.add_shared_args(level3_subparser)
 
