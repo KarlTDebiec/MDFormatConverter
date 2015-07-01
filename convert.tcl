@@ -27,6 +27,8 @@ proc help {} {
     puts "                          first: first frame to read"
     puts "                          last: last frame to read"
     puts "                          step: interval between frames"
+    puts "                        If first and last are both -1, only the topology will"
+    puts "                        be read and all coordinates will be discarded."
     puts ""
     puts "output:"
     puts "  -output OUTPUTSPEC    Output file and settings, may be specified multiple"
@@ -40,8 +42,6 @@ proc help {} {
     puts "                          first: first frame to read"
     puts "                          last: last frame to read"
     puts "                          step: interval between frames"
-    puts "                        If first and last are both -1, only the topology will"
-    puts "                        be read and all coordinates will be discarded."
 }
 
 proc write_mol2_manual_bonds { filename selection first last step } {
