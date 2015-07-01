@@ -34,8 +34,6 @@ class TrajOutput(object):
         """
         import os
 
-        print(kwargs)
-
         self.outpath = os.path.expandvars(outpath)
         if suffix is None:
             self.suffix = suffix
