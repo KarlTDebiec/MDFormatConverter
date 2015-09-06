@@ -18,6 +18,19 @@ class VmdConverter(Converter):
     Manages conversion of segments between formats using VMD.
     """
 
+    def __init__(self, **kwargs):
+        """
+        Initializes and checks if vmd excutable is available.
+
+        Arugments:
+          kwargs (dict): Additional keyword arguments
+        """
+        from commands import getstatusoutput
+        if getstatusoutput("hash vmd")[0] != 0:
+            raise OSError("'vmd' command is not available; check $PATH and "
+                          "modules")
+        super(self.__class__, self).__init__(**kwargs)
+
     def receive_segment(self, **kwargs):
         """
         Receives a trajectory segment.
