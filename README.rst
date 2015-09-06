@@ -1,13 +1,25 @@
 Introduction
 ============
 
-md_format_converter is a python package used to convert Molecular Dynamics (MD)
+md_format_converter is a python script used to convert Molecular Dynamics (MD)
 simulation trajectories that are split into multiple segments between different
-formats. Currently, the package exclusively supports conversion from Anton
-format trajectories to PDB and Amber NetCDF formats, using the program Visual
-Molecular Dynamics (VMD). The package is currently much more complex than
-necessary for this purpose, in order to facilitate future integration in
-complex conversion and analysis pipelines.
+formats. Currently, the package exclusively supports conversion from `Anton
+<https://www.psc.edu/index.php/computing-resources/anton>`_ format trajectories
+to `PDB <http://deposit.rcsb.org/adit/docs/pdb_atom_format.html>`_, `mol2
+<http://www.tripos.com/data/support/mol2.pdf>_, `AMBER text mdcrd
+<http://ambermd.org/formats.html#trajectory>`_, and `GROMACS trr
+<http://www.gromacs.org/Documentation/File_Formats/.trr_File>`_ formats, using
+the program `Visual Molecular Dynamics (VMD)
+<http://www.ks.uiuc.edu/Research/vmd>`_. It supports manual writing of bonds to
+mol2 format (as guessed by VMD based on geometry), which may be helpful for
+recovering trajectories whose atoms are not in standard order. Conversion to a
+single format is supported from the command line, while conversion to multiple
+formats is supported via a `YAML <http://www.yaml.org/spec/1.2/spec.html>`_
+configuration file.
+
+The scripts is much more complex than strictly necessary for the above, as an
+exercise in applying coroutines and writing a complex multilevel argument
+parser.
 
 Dependencies
 ------------
@@ -18,11 +30,9 @@ Molecular Dynamics (VMD).
 Installation
 ------------
 
-Put in your ``$PYTHONPATH``::
+No intstallation is necessary, just run ``convert.py``:
 
-    export PYTHONPATH=/path/to/my/python/modules:$PYTHONPATH
-
-where ``/path/to/my/python/modules`` contains ``md_format_converter``.
+    python /path/to/convert.py -h
 
 Authorship
 ----------
