@@ -6,7 +6,7 @@ simulation trajectories that are split into multiple segments between different
 formats. Currently, the package exclusively supports conversion from `Anton
 <https://www.psc.edu/index.php/computing-resources/anton>`_ format trajectories
 to `PDB <http://deposit.rcsb.org/adit/docs/pdb_atom_format.html>`_, `mol2
-<http://www.tripos.com/data/support/mol2.pdf>_, `AMBER text mdcrd
+<http://www.tripos.com/data/support/mol2.pdf>`_, `AMBER text mdcrd
 <http://ambermd.org/formats.html#trajectory>`_, and `GROMACS trr
 <http://www.gromacs.org/Documentation/File_Formats/.trr_File>`_ formats, using
 the program `Visual Molecular Dynamics (VMD)
