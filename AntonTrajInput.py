@@ -40,6 +40,7 @@ class AntonTrajInput(TrajInput):
         else:
             self.sub_path = None
         self.infile = open(self.trajectory, "r")
+        self.number = 0
 
         super(self.__class__, self).__init__(**kwargs)
 
@@ -47,12 +48,12 @@ class AntonTrajInput(TrajInput):
         """
         Prepares and yields next trajectory segment.
 
-        Segment is numbered using Anton's segment number, and is
-        associated with two files: the atr format trajectory, and, if
-        present, the energy log. Segment is associated with two inputs,
-        the cms format topology file applicable to all segments, from
-        which no frames are instructed to be used, and the atr format
-        trajectory, from which all frames are instructed to be used.
+        Segment index is counted, and is associated with two files: the
+        atr format trajectory, and, if present, the energy log. Segment
+        is associated with two inputs, the cms format topology file
+        applicable to all segments, from which no frames are instructed
+        to be used, and the atr format trajectory, from which all frames
+        are instructed to be used.
 
         Yields:
             (TrajSegment): New trajectory segment
@@ -68,11 +69,12 @@ class AntonTrajInput(TrajInput):
             if self.sub_path is not None:
                 segment_atr = segment_atr.replace(*self.sub_path)
 
-            number = segment_atr.split("/")[-2].split("-")[0]
+            number = "{0:06d}".format(self.number)
             files = [segment_atr]
             ene = os.path.dirname(segment_atr) + "/energy/eneseq.txt"
             if os.path.isfile(ene):
                 files.append(ene)
+            self.number += 1
 
             return TrajSegment(number=number, files = files,
               inputs = [
