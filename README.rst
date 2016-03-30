@@ -17,9 +17,8 @@ single format is supported from the command line, while conversion to multiple
 formats is supported via a `YAML <http://www.yaml.org/spec/1.2/spec.html>`_
 configuration file.
 
-The scripts is much more complex than strictly necessary for the above, as an
-exercise in applying coroutines and writing a complex multilevel argument
-parser.
+The script is much more complex than strictly necessary for the above, as an
+exercise in applying coroutines and writing a multilevel argument parser.
 
 Dependencies
 ------------
